@@ -1,4 +1,4 @@
-const canvas = document.querySelector('#game'),
+const canvas = document.querySelector('#game canvas'),
     ctx = canvas.getContext('2d');
 
 canvas.width = 400;
@@ -21,7 +21,8 @@ let maze = generateMaze(20, 20),
     speed = 4,
     character_id = 0,
     animation_countdown = 5,
-    sx = 3, sy = 0;
+    sx = 3,
+    sy = 0;
 
 character_sprite.src = 'game_assets/c1.png';
 texture.src = 'game_assets/w1.png';
@@ -32,21 +33,23 @@ function getLazyMaze(playerX, playerY) {
 
     let lazyMaze = [[], [], [], [], [], [], []];
     for (let row in Array(7).fill())
-        for (let col in Array(7).fill())
-            try {
-                let x = mazeX + parseInt(col) - 3, y = mazeY + parseInt(row) - 3;
-                lazyMaze[row][col] = maze[y][x];
-            }
-            catch (err) { lazyMaze[row][col] = undefined; }
+        for (let col in Array(7).fill()) {
+            let x = mazeX + parseInt(col) - 3,
+                y = mazeY + parseInt(row) - 3;
+            try {                lazyMaze[row][col] = { conn: maze[y][x], x, y };            }
+            catch (err) { lazyMaze[row][col] = { conn: undefined, x, y }; }
+        }
     return lazyMaze;
 }
 
 function drawPlayer(sx = 1, sy = 0) {
-    let dw = 34, dh = 51;
+    let dw = 34,
+        dh = 51;
     ctx.drawImage(character_sprite, 16 * sx * 8, 24 * sy * 8, 16 * 8, 24 * 8, 200 - dw / 2, 200 - dh / 2, dw, dh);
 }
 
 setInterval(gameLoop, 1e3 / 30);
+
 function gameLoop() {
     ctx.clearRect(0, 0, 400, 400);
 
@@ -67,36 +70,53 @@ function gameLoop() {
         let lazyMaze = getLazyMaze(playerX, playerY);
         for (let [y, row] of lazyMaze.entries())
             for (let [x, tile] of row.entries()) {
-                let leftX = 80 * (x - 1) - (playerX % 80 - 40), topY = 80 * (y - 1) - (playerY % 80 - 40);
+                let leftX = 80 * (x - 1) - (playerX % 80 - 40),
+                    topY = 80 * (y - 1) - (playerY % 80 - 40);
                 handler({ lazyMaze, y, row, x, tile, leftX, topY })
             }
     }
 
     // Draw Tiles
-    forEachTile(v => { if (v.tile) ctx.drawImage(texture, 0, 0, 32 * 8, 32 * 8, v.leftX, v.topY, 80, 80); })
+    forEachTile(v => { if (v.tile.conn) ctx.drawImage(texture, 0, 0, 32 * 8, 32 * 8, v.leftX, v.topY, 80, 80); })
 
     // Draw Walls' Edge
     forEachTile(v => {
-        if (v.tile) {
-            let drawEdge = (full) => ctx.drawImage(texture, 28 * 8, full ? 32 * 8 : 40 * 8, 8 * 8, 8 * 8, v.leftX - 10 + 80, v.topY + 70, 20, 20);
-            v.y <= 5 ? drawEdge(v.lazyMaze[v.y + 1][v.x] & 4) : drawEdge(true);
+        if (v.tile.conn) {
+            let drawEdge = (x, y, full) => ctx.drawImage(texture, 28 * 8, !full ? 32 * 8 : 40 * 8, 8 * 8, 8 * 8, x, y, 20, 20);
+
+            if (v.tile.x == 0 && v.tile.y == 0) drawEdge(v.leftX - 10, v.topY - 10, false);
+            if (v.tile.x == 0)
+                drawEdge(v.leftX - 10, v.topY + 70, (v.tile.y == maze.length - 1));
+            if (v.tile.y == 0) drawEdge(v.leftX + 70, v.topY - 10, v.lazyMaze[v.y][v.x].conn & 4)
+            drawEdge(v.leftX + 70, v.topY + 70, (v.y <= 5) ? (v.lazyMaze[v.y + 1][v.x].conn || 4) & 4 : true);
         }
     });
 
-    // forEachTile(v => {
-    //     if (v.tile) {
-    //         if (!(v.tile & 4)) {
-    //             // ctx.save();
-    //             // ctx.translate(v.leftX + 90, v.topY + 10);
-    //             // ctx.rotate(90 * Math.PI / 180);
-    //             ctx.drawImage(texture, 0, 32 * 8, 28 * 8, 8 * 8, v.leftX + 90, v.topY + 10, 60, 20);
-    //             console.log(v.lazyMaze.toString())
-    //             // ctx.restore();
-    //         }
-    //     }
-    // });
+    // Draw Walls
+    forEachTile(v => {
+        if (v.tile.conn) {
+            let drawWall = (x, y, horizontal) => {
+                if (horizontal) {
+                    ctx.drawImage(texture, 0, 40 * 8, 28 * 8, 8 * 8, x, y, 60, 20);
+                } else {
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate(-90 * Math.PI / 180);
+                    ctx.drawImage(texture, 0, 32 * 8, 28 * 8, 8 * 8, 0, 0, 60, 20);
+                    ctx.restore();
+                }
+            }
+
+            if (v.tile.x == 0) drawWall(v.leftX - 10, v.topY + 70, false);
+            if (v.tile.y == 0) drawWall(v.leftX + 10, v.topY - 10, true);
+            if (!(v.tile.conn & 4)) drawWall(v.leftX + 70, v.topY + 70, false);
+            if (!(v.tile.conn & 2)) drawWall(v.leftX + 10, v.topY + 70, true);
+        }
+    });
 
     drawPlayer((!move || sx == 3) ? 1 : sx, (!move) ? 0 : sy);
 
     // document.querySelector('#debug').innerHTML = parseInt(playerX) + ',' + parseInt(playerY);
 }
+
+console.log(maze.map(v => v.join(',')).join('\n'));

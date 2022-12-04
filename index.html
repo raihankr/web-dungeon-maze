@@ -2,67 +2,99 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pixel Maze by Han</title>
-  <style>
-    * {
-      -webkit-box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dungeon Maze by Han</title>
+    <style>
+        * {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
 
-    body {
-      width: 100vw;
-      padding: 0;
-      margin: 0;
-      background-color: black;
-      /* background-image: url(game_assets/floor.jpg);
-      background-repeat: repeat; */
-    }
+        body {
+            padding: 0;
+            margin: 0;
+            background-color: black;
+            overflow: none;
+        }
 
-    div:has(#game) {
-      display: flex;
-      justify-content: center;
-    }
+        #game {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    #game {
-      display: inline-block;
-      width: 100vmin;
-      height: 100vmin;
-      margin: auto;
-      background-color: rgb(34, 34, 34);
-      image-rendering: pixelated;
-      border-radius: 50%;
-      /* background-image: url(game_assets/floor.jpg);
-      background-size: 30%;
-      background-position: 0 0;
-      background-repeat: repeat; */
-    }
+        #game canvas {
+            display: inline;
+            width: 98vmin;
+            height: 98vmin;
+            background-color: rgb(25, 25, 25);
+            image-rendering: pixelated;
+            border-radius: 50%;
+        }
 
-    #filter {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      z-index: 2;
-      width: 102vmin;
-      height: 102vmin;
-      margin-top: -51vmin;
-      margin-left: -51vmin;
-      background-color: #fff0;
-      border-radius: 50%;
-      box-shadow: inset 0 0 60px 60px black;
-    }
-  </style>
+        #filter {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            z-index: 1;
+            width: 100vmin;
+            height: 100vmin;
+            margin-top: -50vmin;
+            margin-left: -50vmin;
+            background-color: #fff0;
+            border-radius: 50%;
+            box-shadow: inset 0 0 60px 60px black;
+        }
+        
+        #joystick {
+            display: none;
+            width: 120px;
+            height: 120px;
+            position: fixed;
+            bottom: 50px;
+            left: 25px;
+            background-image: url(game_assets/cn1.png);
+            background-size: 240px 120px;
+            background-position: 0 0;
+            background-repeat: no-repeat;
+            z-index: 2;
+        }
+        
+        #joystick div {
+            width: 60px;
+            height: 60px;
+            position: absolute;
+            background-image: url(game_assets/cn1.png);
+            background-size: 240px 120px;
+            background-position: -150px -30px;
+            background-repeat: no-repeat;
+            z-index: 2;
+            top: 50%;
+            left: 50%;
+            margin-top: -30px;
+            margin-left: -30px;
+        }
+    </style>
 </head>
 
 <body>
-  <div><canvas id="game"></canvas></div>
-  <div id="filter"></div>
-  <!-- <p style="color: white" id="debug"></p> -->
+    <div id="game"><canvas></canvas></div>
+    <div id="filter"></div>
+    <!-- <p style="color: white" id="debug"></p> -->
+    <div id='joystick'><div></div></div>
 
-  <script src="maze_generator.js"></script>
-  <script src='game.js'></script>
+    <script src="maze_generator.js"></script>
+    <script src='game.js'></script>
 </body>
 
 </html>
