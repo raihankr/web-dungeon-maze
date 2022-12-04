@@ -83,18 +83,17 @@ function gameLoop() {
         }
     });
 
-    // forEachTile(v => {
-    //     if (v.tile) {
-    //         if (!(v.tile & 4)) {
-    //             // ctx.save();
-    //             // ctx.translate(v.leftX + 90, v.topY + 10);
-    //             // ctx.rotate(90 * Math.PI / 180);
-    //             ctx.drawImage(texture, 0, 32 * 8, 28 * 8, 8 * 8, v.leftX + 90, v.topY + 10, 60, 20);
-    //             console.log(v.lazyMaze.toString())
-    //             // ctx.restore();
-    //         }
-    //     }
-    // });
+    forEachTile(v => {
+        if (v.tile) {
+            if (!(v.tile & 4)) {
+                ctx.save();
+                ctx.translate(v.leftX + 90, v.topY - 10);
+                ctx.rotate(-90 * Math.PI / 180);
+                ctx.drawImage(texture, 0, 32 * 8, 28 * 8, 8 * 8, v.leftX + 90, v.topY - 10, 60, 20);
+                ctx.restore();
+            }
+        }
+    });
 
     drawPlayer((!move || sx == 3) ? 1 : sx, (!move) ? 0 : sy);
 
