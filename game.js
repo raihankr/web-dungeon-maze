@@ -1,6 +1,6 @@
 'use strict';
 
-const canvas = document.querySelector('#game canvas'),
+const canvas = document.querySelector('#game'),
     ctx = canvas.getContext('2d');
 
 canvas.width = 400;
@@ -15,19 +15,18 @@ window.addEventListener('keyup', e => {
     keys[e.keyCode] = false;
 });
 
-let maze = generateMaze(20, 20),
+let maze = generateMaze(3, 3),
     character_sprite = new Image,
     texture = new Image,
-    playerX = 40,
-    playerY = 40,
+    playerX = 120,
+    playerY = 120,
     speed = 3,
-    character_id = 0,
     animation_countdown = 5,
-    sx = 3,
+    sx = 1,
     sy = 0;
 
-character_sprite.src = 'game_assets/c1.png';
-texture.src = 'game_assets/w1.png';
+character_sprite.src = 'assets/c1.png';
+texture.src = 'assets/w1.png';
 
 function getLazyMaze(playerX, playerY) {
     let mazeX = Math.floor(playerX / 80),
@@ -78,7 +77,7 @@ function gameLoop() {
     if ((playerY % 80 < 10 || playerY % 80 > 70) && (nextX < 15 || nextX > 65)) speedX = 0;
 
     playerX += speedX, playerY += speedY;
-    if (!move) sx = 3;
+    if (!move) sx = 1;
     if (--animation_countdown < 1) {
         animation_countdown = 5;
         if (move && ++sx > 3) sx = 0;
@@ -91,12 +90,18 @@ function gameLoop() {
             for (let [x, tile] of row.entries()) {
                 let leftX = 80 * (x - 1) - (playerX % 80 - 40),
                     topY = 80 * (y - 1) - (playerY % 80 - 40);
-                handler({ lazyMaze, y, row, x, tile, leftX, topY })
+                handler({ lazyMaze, y, row, x, tile, leftX, topY });
             }
     }
 
     // Draw Tiles
-    forEachTile(v => { if (v.tile.conn) ctx.drawImage(texture, 0, 0, 32 * 8, 32 * 8, v.leftX, v.topY, 80, 80); })
+    forEachTile(v => {
+        if (v.tile.conn) {
+            let drawTile = (sx, sy) => ctx.drawImage(texture, 0 + 32 * 8 * sx, 0 + 32 * 8 * sy, 32 * 8, 32 * 8, v.leftX, v.topY, 80, 80);
+            if (v.tile.x == maze[0].length - 1 && v.tile.y == maze.length - 1) drawTile(1, 0);
+            else drawTile(0, 0);
+        }
+    });
 
     // Draw Walls' Edge
     forEachTile(v => {
@@ -137,5 +142,3 @@ function gameLoop() {
 
     // document.querySelector('#debug').innerHTML = parseInt(playerX) + ',' + parseInt(playerY);
 }
-
-console.log(maze.map(v => v.join(',')).join('\n'));

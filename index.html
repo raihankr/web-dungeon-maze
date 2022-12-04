@@ -5,13 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dungeon Maze by Han</title>
+    <link rel="icon" href="favicon.jpeg" />
     <style>
+        @font-face {
+            font-family: retro-gaming;
+            src: url(assets/Retro\ Gaming.ttf)
+        }
+
         * {
             -webkit-box-sizing: border-box;
             -moz-box-sizing: border-box;
             box-sizing: border-box;
+            font-family: retro-gaming;
+            color: white;
         }
-        
+
         html,
         body {
             width: 100%;
@@ -25,18 +33,31 @@
             overflow: none;
         }
 
-        #game {
+        header {
             width: 100%;
             height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: fixed;
+            z-index: 2;
         }
 
-        #game canvas {
-            display: inline;
+        header h1 {
+            position: fixed;
+            top: 5vh;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            font-size: 10vmin;
+            text-shadow: 0 0 10px black;
+        }
+
+        #game {
+            position: fixed;
             width: 98vmin;
             height: 98vmin;
+            top: 50%;
+            left: 50%;
+            margin-top: -49vmin;
+            margin-left: -49vmin;
             background-color: rgb(25, 25, 25);
             image-rendering: pixelated;
             border-radius: 50%;
@@ -55,7 +76,7 @@
             border-radius: 50%;
             box-shadow: inset 0 0 60px 60px black;
         }
-        
+
         #joystick {
             display: none;
             width: 120px;
@@ -69,7 +90,7 @@
             background-repeat: no-repeat;
             z-index: 2;
         }
-        
+
         #joystick div {
             width: 60px;
             height: 60px;
@@ -88,10 +109,15 @@
 </head>
 
 <body>
-    <div id="game"><canvas></canvas></div>
+    <header>
+        <h1>Dungeon Maze</h1>
+    </header>
+    <canvas id="game"></canvas>
     <div id="filter"></div>
     <!-- <p style="color: white" id="debug"></p> -->
-    <div id='joystick'><div></div></div>
+    <div id='joystick'>
+        <div></div>
+    </div>
 
     <script src="maze_generator.js"></script>
     <script src='game.js'></script>
