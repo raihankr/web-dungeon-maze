@@ -49,6 +49,21 @@
             font-size: 10vmin;
             text-shadow: 0 0 10px black;
         }
+        
+        #startconfig {
+            width: 100%;
+            margin-top: calc(50vh + 50vw);
+            padding: 15px;
+            font-size: 15px;
+        }
+        
+        #startconfig input[type=number] {
+            width: 30px;
+            color: white;
+            background-color: transparent;
+            border: none;
+            border-bottom: 3px solid white;
+        }
 
         #game {
             position: fixed;
@@ -84,7 +99,7 @@
             position: fixed;
             bottom: 50px;
             left: 25px;
-            background-image: url(game_assets/cn1.png);
+            background-image: url(assets/control.png);
             background-size: 240px 120px;
             background-position: 0 0;
             background-repeat: no-repeat;
@@ -95,7 +110,7 @@
             width: 60px;
             height: 60px;
             position: absolute;
-            background-image: url(game_assets/cn1.png);
+            background-image: url(assets/control.png);
             background-size: 240px 120px;
             background-position: -150px -30px;
             background-repeat: no-repeat;
@@ -111,6 +126,15 @@
 <body>
     <header>
         <h1>Dungeon Maze</h1>
+        <form id='startconfig'>
+            <label for='width'>Size of the maze:</label>
+            <input type='number' min='10' max='100' name='width' id='width' value='20' />
+            <label for='height'> x </label>
+            <input type='number' min='10' max='100' name='height' id='height' value='20' />
+            <br />
+            <label for>Show mini map</label>
+            <input type='checkbox' name='minimap' id='show-minimap' />
+        </form>
     </header>
     <canvas id="game"></canvas>
     <div id="filter"></div>

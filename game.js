@@ -1,5 +1,15 @@
 'use strict';
 
+/** TODO:
+ * Setting up starting screen.
+ ** INPUT: Size of the maze (min 10)
+ ** INPUT: Show mini map
+ * Adding mini map option
+ * Adding touch input for mobile phone.
+ * Adding time mechanic
+ * Setting up ending screen
+ */
+
 const canvas = document.querySelector('#game'),
     ctx = canvas.getContext('2d');
 
@@ -8,7 +18,6 @@ canvas.height = 400;
 
 let keys = []
 window.addEventListener('keydown', e => {
-    e.preventDefault();
     keys[e.keyCode] = true;
 });
 window.addEventListener('keyup', e => {
@@ -18,6 +27,7 @@ window.addEventListener('keyup', e => {
 let maze = generateMaze(3, 3),
     character_sprite = new Image,
     texture = new Image,
+    shadow = new Image,
     playerX = 120,
     playerY = 120,
     speed = 3,
@@ -25,8 +35,9 @@ let maze = generateMaze(3, 3),
     sx = 1,
     sy = 0;
 
-character_sprite.src = 'assets/c1.png';
-texture.src = 'assets/w1.png';
+character_sprite.src = 'assets/character.png';
+texture.src = 'assets/texture.png';
+shadow.src = 'assets/shadow.png'
 
 function getLazyMaze(playerX, playerY) {
     let mazeX = Math.floor(playerX / 80),
@@ -102,6 +113,12 @@ function gameLoop() {
             else drawTile(0, 0);
         }
     });
+    
+    // Draw player's shadow
+    ctx.save();
+    ctx.globalAlpha = .8;
+    ctx.drawImage(shadow, 0, 0, 16 * 8, 16 * 8, 200 - 34 / 2, 200 - 51 / 2, 34, 51);
+    ctx.restore();
 
     // Draw Walls' Edge
     forEachTile(v => {
