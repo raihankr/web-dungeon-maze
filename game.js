@@ -16,12 +16,14 @@ const canvas = document.querySelector('#game'),
 canvas.width = 400;
 canvas.height = 400;
 
-let keys = []
+let keys = {};
 window.addEventListener('keydown', e => {
-    keys[e.keyCode] = true;
+    if (e.target.matches('input, textarea')) return;
+    e.preventDefault();
+    keys[e.code] = true;
 });
 window.addEventListener('keyup', e => {
-    keys[e.keyCode] = false;
+    keys[e.code] = false;
 });
 
 let maze = generateMaze(3, 3),
@@ -66,13 +68,14 @@ function gameLoop() {
     ctx.clearRect(0, 0, 400, 400);
 
     let speedX = 0, speedY = 0, speed_ = speed / 400 * canvas.clientWidth;
-    let move = keys.slice(37, 41).concat(keys[65], keys[68], keys[83], keys[87]).includes(true);
+    let move = false;
     let currentTile = maze[Math.floor(playerY / 80)][Math.floor(playerX / 80)];
 
-    if (keys[38] || keys[87]) speedY = -speed_, sy = 1; // Move up
-    if (keys[40] || keys[83]) speedY = speed_, sy = 0; // Move down
-    if (keys[37] || keys[65]) speedX = -speed_, sy = 2; // Move left
-    if (keys[39] || keys[68]) speedX = speed_, sy = 3; // Move right
+    if (keys.ArrowUp || keys.KeyW) speedY = -speed_, sy = 1; // Move up
+    if (keys.ArrowDown || keys.KeyS) speedY = speed_, sy = 0; // Move down
+    if (keys.ArrowLeft || keys.KeyA) speedX = -speed_, sy = 2; // Move left
+    if (keys.ArrowRight || keys.KeyD) speedX = speed_, sy = 3; // Move right
+    if (speedX || speedY) move = true;
 
     let nextX = playerX % 80 + speedX, nextY = playerY % 80 + speedY;
     // console.log(speedX, speedY)
