@@ -92,11 +92,6 @@
             transition: visibility 1s, opacity 1s;
         }
 
-        .blur:target {
-            visibility: visible;
-            opacity: 1;
-        }
-
         .startbutton {
             visibility: visible;
             opacity: 1;
@@ -108,28 +103,63 @@
             font-size: 25px;
         }
 
+        #start .startbutton {
+            position: initial;
+            display: block;
+            margin: 10px auto;
+            transform: none;
+        }
+
         .wrapper {
             width: 100%;
             max-width: 600px;
             display: block;
-            overflow: scroll;
+            overflow-x: hidden;
+            overflow-y: scroll;
             overflow-wrap: word-wrap;
             padding: 15px;
             margin: auto;
         }
 
+        .wrapper::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .wrapper::-webkit-scrollbar-track {
+            background: #79797950;
+        }
+
+        .wrapper::-webkit-scrollbar-thumb {
+            background: white;
+        }
+
         #start {
-            padding-top: 30vh;
+            padding-top: 40vh;
             font-size: 15px;
         }
 
-        #start:target~.startbutton {
+        #start .wrapper {
+            height: 45vh;
+            position: relative;
+        }
+
+        #start.visible~.startbutton {
             visibility: hidden;
             opacity: 0;
         }
 
-        #start div>* {
+        #start .wrapper>* {
             margin-bottom: 5px;
+        }
+
+        .closebutton  {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 30px;
+            height: 30px;
+            font-size: 30px;
+            transition: scale .1s;
         }
 
         #start input[type=number] {
@@ -155,13 +185,15 @@
             padding-left: 25px;
         }
 
-        .summary>span {
-            transform: rotate(90deg);
-            border: none;
+        .summary+.details {
+            visibility: hidden;
+            max-height: 0;
+            transition: visibility 1s, max-height 1s;
         }
-        
-        .summary>input:checked+span {
-            transform: rotate(180deg);
+
+        .summary:has(input:checked)+.details {
+            visibility: visible;
+            max-height: 100%;
         }
 
         input[type=checkbox] {
@@ -178,15 +210,25 @@
             width: 20px;
             height: 20px;
             border: 3px solid white;
-            transition: transform .1s, height .1s;
+            transition: scale .1s, rotate .1s ease, height .1s;
         }
 
         input[type=checkbox]:checked+span {
-            transform: rotate(-45deg);
+            rotate: -45deg;
             border: none;
             border-bottom: 3px solid white;
             border-left: 3px solid white;
             height: 10px;
+        }
+
+        .summary>input+span {
+            rotate: 90deg;
+            border: none;
+        }
+        
+        .summary>input:checked+span {
+            rotate: 180deg;
+            border: none;
         }
 
         textarea {
@@ -198,6 +240,7 @@
             border-left: 5px solid #797979;
             border-bottom: 5px solid #cfcfcf;
             border-right: 5px solid #cfcfcf;
+            resize: none;
         }
 
         #game {
@@ -256,16 +299,24 @@
             margin-left: -30px;
         }
 
+        .visible {
+            visibility: visible;
+            opacity: 1;
+        }
+
         @media (hover: hover) {
-            input[type=checkbox]+span:hover {
-                transform: scale(1.5);
+            .closebutton:hover {
+                scale: 1.5;
+                
             }
 
-            input[type=checkbox]:checked+span:hover {
-                transform: scale(1.5) rotate(-45deg);
+            input[type=checkbox]+span:hover {
+                scale: 1.5;
             }
             
-            .summary>input:checked+span:
+            .summary>input+span:hover {
+                scale: 1;
+            }
         }
     </style>
 </head>
@@ -275,6 +326,7 @@
         <h1>Dungeon Maze</h1>
         <form id="start" class="blur">
             <div class='wrapper'>
+                <a class="closebutton" onclick="document.querySelector('#start').classList.remove('visible')">&times;</a>
                 <label for="width">Size of the maze:</label>
                 <input type="number" min="10" max="100" name="width" id="width" value="20" />
                 <label for="height"> x </label>
@@ -290,11 +342,11 @@
                     <input type="checkbox" class="summary" />
                     <span>&#9650;</span>
                 </label>
-                <textarea name="importmaze" id="importmaze"></textarea>
-                <button class="grey button startbutton" onclick="location.href = '#'">START</button>
+                <textarea name="importmaze" id="importmaze" class="details"></textarea>
+                <button type="submit" class="grey button startbutton">START</button>
             </div>
         </form>
-        <a class="grey button startbutton" href="#start">START</a>
+        <button type="button" class="grey button startbutton" onclick="document.querySelector('#start').classList.add('visible')">START</button>
     </header>
     <canvas id="game"></canvas>
     <div id="filter"></div>
