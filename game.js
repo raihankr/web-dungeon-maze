@@ -16,16 +16,6 @@ const canvas = document.querySelector('#game'),
 canvas.width = 400;
 canvas.height = 400;
 
-let keys = {};
-window.addEventListener('keydown', e => {
-    if (e.target.matches('input, textarea')) return;
-    e.preventDefault();
-    keys[e.code] = true;
-});
-window.addEventListener('keyup', e => {
-    keys[e.code] = false;
-});
-
 let maze = generateMaze(3, 3),
     character_sprite = new Image,
     texture = new Image,
@@ -36,6 +26,21 @@ let maze = generateMaze(3, 3),
     animation_countdown = 5,
     sx = 1,
     sy = 0;
+    
+document.querySelector('#start').addEventListener('submit', e => {
+    e.preventDefault();
+})
+
+let keys = {};
+window.addEventListener('keydown', e => {
+    if (e.target.matches('input, textarea')) return;
+    e.preventDefault();
+    keys[e.code] = true;
+});
+window.addEventListener('keyup', e => {
+    keys[e.code] = false;
+});
+
 
 character_sprite.src = 'assets/character.png';
 texture.src = 'assets/texture.png';

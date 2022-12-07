@@ -24,6 +24,10 @@
         body {
             width: 100%;
             height: 100%;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         body {
@@ -37,7 +41,7 @@
             width: 100%;
             height: 100%;
             position: fixed;
-            z-index: 2;
+            z-index: 5;
         }
 
         header h1 {
@@ -48,11 +52,15 @@
             text-align: center;
             font-size: 10vmin;
             text-shadow: 0 0 10px black;
-            z-index: 3;
+            z-index: 10;
         }
 
-        button,
-        .button {
+        a.button,
+        label {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .grey.button {
             padding: 5px;
             color: #555;
             background-color: #a0a0a0;
@@ -64,15 +72,32 @@
             border-right: 8px solid #797979;
         }
 
-        button:active,
-        .button:active {
+        .grey.button:active {
             border-top: 8px solid #797979;
             border-left: 8px solid #797979;
             border-bottom: 8px solid #cfcfcf;
             border-right: 8px solid #cfcfcf;
         }
 
-        #startbutton {
+        .blur {
+            visibility: hidden;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+            transition: visibility 1s, opacity 1s;
+        }
+
+        .blur:target {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .startbutton {
             visibility: visible;
             opacity: 1;
             position: fixed;
@@ -83,27 +108,28 @@
             font-size: 25px;
         }
 
-        #start {
-            visibility: hidden;
-            opacity: 0;
+        .wrapper {
             width: 100%;
-            height: 100%;
+            max-width: 600px;
+            display: block;
+            overflow: scroll;
+            overflow-wrap: word-wrap;
             padding: 15px;
-            padding-top: 50vh;
+            margin: auto;
+        }
+
+        #start {
+            padding-top: 30vh;
             font-size: 15px;
-            -webkit-backdrop-filter: blur(5px);
-            backdrop-filter: blur(5px);
-            transition: visibility 1s, opacity 1s;
         }
 
-        #start:target {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        #start:target~a {
+        #start:target~.startbutton {
             visibility: hidden;
             opacity: 0;
+        }
+
+        #start div>* {
+            margin-bottom: 5px;
         }
 
         #start input[type=number] {
@@ -126,6 +152,16 @@
             display: inline-block;
             cursor: pointer;
             position: relative;
+            padding-left: 25px;
+        }
+
+        .summary>span {
+            transform: rotate(90deg);
+            border: none;
+        }
+        
+        .summary>input:checked+span {
+            transform: rotate(180deg);
         }
 
         input[type=checkbox] {
@@ -145,20 +181,23 @@
             transition: transform .1s, height .1s;
         }
 
-        input[type=checkbox]+span:hover {
-            transform: scale(1.5);
-        }
-
-        input[type=checkbox]:checked+span:hover {
-            transform: scale(1.5) rotate(-45deg);
-        }
-
         input[type=checkbox]:checked+span {
             transform: rotate(-45deg);
             border: none;
             border-bottom: 3px solid white;
             border-left: 3px solid white;
             height: 10px;
+        }
+
+        textarea {
+            display: block;
+            width: 100%;
+            height: 100px;
+            background-color: #a0a0a0;
+            border-top: 5px solid #797979;
+            border-left: 5px solid #797979;
+            border-bottom: 5px solid #cfcfcf;
+            border-right: 5px solid #cfcfcf;
         }
 
         #game {
@@ -216,25 +255,46 @@
             margin-top: -30px;
             margin-left: -30px;
         }
+
+        @media (hover: hover) {
+            input[type=checkbox]+span:hover {
+                transform: scale(1.5);
+            }
+
+            input[type=checkbox]:checked+span:hover {
+                transform: scale(1.5) rotate(-45deg);
+            }
+            
+            .summary>input:checked+span:
+        }
     </style>
 </head>
 
 <body>
     <header>
         <h1>Dungeon Maze</h1>
-        <form id="start">
-            <label for="width">Size of the maze:</label>
-            <input type="number" min="10" max="100" name="width" id="width" value="20" />
-            <label for="height"> x </label>
-            <input type="number" min="10" max="100" name="height" id="height" value="20" />
-            <br />
-            <label for>Show mini map</label>
-            <label class="checkbox-container">
-                <input type="checkbox" name="minimap" id="show-minimap" />
-                <span></span>
-            </label>
+        <form id="start" class="blur">
+            <div class='wrapper'>
+                <label for="width">Size of the maze:</label>
+                <input type="number" min="10" max="100" name="width" id="width" value="20" />
+                <label for="height"> x </label>
+                <input type="number" min="10" max="100" name="height" id="height" value="20" />
+                <br />
+                <label for="show-minimap">Show mini map</label>
+                <label class="checkbox-container">
+                    <input type="checkbox" name="minimap" id="show-minimap" />
+                    <span></span>
+                </label>
+                <br /> <br />
+                <label class="checkbox-container summary">Import maze (optional)
+                    <input type="checkbox" class="summary" />
+                    <span>&#9650;</span>
+                </label>
+                <textarea name="importmaze" id="importmaze"></textarea>
+                <button class="grey button startbutton" onclick="location.href = '#'">START</button>
+            </div>
         </form>
-        <a id="startbutton" class="button" href="#start">START</a>
+        <a class="grey button startbutton" href="#start">START</a>
     </header>
     <canvas id="game"></canvas>
     <div id="filter"></div>
