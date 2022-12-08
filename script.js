@@ -26,10 +26,23 @@ let maze = generateMaze(3, 3),
     animation_countdown = 5,
     sx = 1,
     sy = 0;
-    
+
+// Start a new game
 document.querySelector('#start').addEventListener('submit', e => {
     e.preventDefault();
-})
+
+    document.querySelector('#game').classList.remove('visible');
+    document.querySelector('#start').classList.remove('visible');
+    document.querySelector('header h1').classList.remove('visible');
+    setTimeout(() => {
+        let width = document.querySelector('#width').value;
+        let height = document.querySelector('#height').value;
+        maze = generateMaze(width, height);
+        playerX = 40, playerY = 40;
+
+        document.querySelector('#game').classList.add('visible');
+    }, 1000);
+});
 
 let keys = {};
 window.addEventListener('keydown', e => {
@@ -40,7 +53,6 @@ window.addEventListener('keydown', e => {
 window.addEventListener('keyup', e => {
     keys[e.code] = false;
 });
-
 
 character_sprite.src = 'assets/character.png';
 texture.src = 'assets/texture.png';
@@ -72,7 +84,9 @@ setInterval(gameLoop, 1e3 / 30);
 function gameLoop() {
     ctx.clearRect(0, 0, 400, 400);
 
-    let speedX = 0, speedY = 0, speed_ = speed / 400 * canvas.clientWidth;
+    let speedX = 0,
+        speedY = 0,
+        speed_ = speed / 400 * canvas.clientWidth;
     let move = false;
     let currentTile = maze[Math.floor(playerY / 80)][Math.floor(playerX / 80)];
 
@@ -82,7 +96,8 @@ function gameLoop() {
     if (keys.ArrowRight || keys.KeyD) speedX = speed_, sy = 3; // Move right
     if (speedX || speedY) move = true;
 
-    let nextX = playerX % 80 + speedX, nextY = playerY % 80 + speedY;
+    let nextX = playerX % 80 + speedX,
+        nextY = playerY % 80 + speedY;
     // console.log(speedX, speedY)
 
     // Stop if collide with wall
@@ -116,12 +131,13 @@ function gameLoop() {
     // Draw Tiles
     forEachTile(v => {
         if (v.tile.conn) {
-            let drawTile = (sx, sy) => ctx.drawImage(texture, 0 + 32 * 8 * sx, 0 + 32 * 8 * sy, 32 * 8, 32 * 8, v.leftX, v.topY, 80, 80);
+            let drawTile = (sx, sy) =>
+                ctx.drawImage(texture, 0 + 32 * 8 * sx, 0 + 32 * 8 * sy, 32 * 8, 32 * 8, v.leftX, v.topY, 80, 80);
             if (v.tile.x == maze[0].length - 1 && v.tile.y == maze.length - 1) drawTile(1, 0);
             else drawTile(0, 0);
         }
     });
-    
+
     // Draw player's shadow
     ctx.save();
     ctx.globalAlpha = .8;
@@ -131,7 +147,8 @@ function gameLoop() {
     // Draw Walls' Edge
     forEachTile(v => {
         if (v.tile.conn) {
-            let drawEdge = (x, y, full) => ctx.drawImage(texture, 28 * 8, !full ? 32 * 8 : 40 * 8, 8 * 8, 8 * 8, x, y, 20, 20);
+            let drawEdge = (x, y, full) =>
+                ctx.drawImage(texture, 28 * 8, !full ? 32 * 8 : 40 * 8, 8 * 8, 8 * 8, x, y, 20, 20);
 
             if (v.tile.x == 0 && v.tile.y == 0) drawEdge(v.leftX - 10, v.topY - 10, false);
             if (v.tile.x == 0)

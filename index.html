@@ -53,9 +53,11 @@
             font-size: 10vmin;
             text-shadow: 0 0 10px black;
             z-index: 10;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 1s, opacity 1s;
         }
 
-        a.button,
         label {
             -webkit-tap-highlight-color: transparent;
         }
@@ -161,6 +163,11 @@
             font-size: 30px;
             transition: scale .1s;
         }
+        
+        .visible {
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
 
         #start input[type=number] {
             width: 30px;
@@ -210,7 +217,7 @@
             width: 20px;
             height: 20px;
             border: 3px solid white;
-            transition: scale .1s, rotate .1s ease, height .1s;
+            transition: scale .1s, rotate .1s, height .1s;
         }
 
         input[type=checkbox]:checked+span {
@@ -222,13 +229,17 @@
         }
 
         .summary>input+span {
-            rotate: 90deg;
-            border: none;
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent !important;
+            border-bottom: 5px solid transparent  !important;
+            border-left: 12px solid white !important;
+            border-right: none;
+            transition: rotate .1s;
         }
         
         .summary>input:checked+span {
-            rotate: 180deg;
-            border: none;
+            rotate: 90deg;
         }
 
         textarea {
@@ -254,6 +265,9 @@
             background-color: rgb(25, 25, 25);
             image-rendering: pixelated;
             border-radius: 50%;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 1s, opacity 1s;
         }
 
         #filter {
@@ -299,15 +313,9 @@
             margin-left: -30px;
         }
 
-        .visible {
-            visibility: visible;
-            opacity: 1;
-        }
-
         @media (hover: hover) {
             .closebutton:hover {
                 scale: 1.5;
-                
             }
 
             input[type=checkbox]+span:hover {
@@ -323,9 +331,9 @@
 
 <body>
     <header>
-        <h1>Dungeon Maze</h1>
+        <h1 class="visible">Dungeon Maze</h1>
         <form id="start" class="blur">
-            <div class='wrapper'>
+            <div class="wrapper">
                 <a class="closebutton" onclick="document.querySelector('#start').classList.remove('visible')">&times;</a>
                 <label for="width">Size of the maze:</label>
                 <input type="number" min="10" max="100" name="width" id="width" value="20" />
@@ -340,7 +348,7 @@
                 <br /> <br />
                 <label class="checkbox-container summary">Import maze (optional)
                     <input type="checkbox" class="summary" />
-                    <span>&#9650;</span>
+                    <span></span>
                 </label>
                 <textarea name="importmaze" id="importmaze" class="details"></textarea>
                 <button type="submit" class="grey button startbutton">START</button>
@@ -348,14 +356,14 @@
         </form>
         <button type="button" class="grey button startbutton" onclick="document.querySelector('#start').classList.add('visible')">START</button>
     </header>
-    <canvas id="game"></canvas>
+    <canvas id="game" class="visible"></canvas>
     <div id="filter"></div>
     <div id="joystick">
         <div></div>
     </div>
 
     <script src="maze_generator.js"></script>
-    <script src="game.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>
