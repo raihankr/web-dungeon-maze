@@ -1,20 +1,21 @@
 'use strict';
 
 /** TODO:
- * Setting up starting screen.
- ** INPUT: Size of the maze (min 10)
- ** INPUT: Show mini map
  * Adding mini map option
  * Adding touch input for mobile phone.
  * Adding time mechanic
  * Setting up ending screen
  */
 
-const canvas = document.querySelector('#game'),
+const canvas = $('#game'),
     ctx = canvas.getContext('2d');
 
 canvas.width = 400;
 canvas.height = 400;
+
+$('#width').value = localStorage.width || 20;
+$('#height').value = localStorage.height || 20;
+$('#show-minimap').checked = parseInt(localStorage.showMinimap);
 
 let maze = generateMaze(3, 3),
     character_sprite = new Image,
@@ -28,19 +29,23 @@ let maze = generateMaze(3, 3),
     sy = 0;
 
 // Start a new game
-document.querySelector('#start').addEventListener('submit', e => {
+$('#start').addEventListener('submit', e => {
     e.preventDefault();
 
-    document.querySelector('#game').classList.remove('visible');
-    document.querySelector('#start').classList.remove('visible');
-    document.querySelector('header h1').classList.remove('visible');
+    let width = $('#width').value;
+    let height = $('#height').value;
+    let showMinimap = $('#show-minimap').checked ? 1 : 0;
+
+    localStorage.width = width;
+    localStorage.height = height;
+    localStorage.showMinimap = showMinimap;
+
+    $.all('#game, #start, header h1, header>.startbutton').forEach(el => el.classList.add('hidden'));
     setTimeout(() => {
-        let width = document.querySelector('#width').value;
-        let height = document.querySelector('#height').value;
         maze = generateMaze(width, height);
         playerX = 40, playerY = 40;
 
-        document.querySelector('#game').classList.add('visible');
+        $('#game').classList.remove('hidden');
     }, 1000);
 });
 
@@ -182,5 +187,5 @@ function gameLoop() {
 
     drawPlayer((!move || sx == 3) ? 1 : sx, (!move) ? 0 : sy);
 
-    // document.querySelector('#debug').innerHTML = parseInt(playerX) + ',' + parseInt(playerY);
+    // $('#debug').innerHTML = parseInt(playerX) + ',' + parseInt(playerY);
 }

@@ -53,9 +53,6 @@
             font-size: 10vmin;
             text-shadow: 0 0 10px black;
             z-index: 10;
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 1s, opacity 1s;
         }
 
         label {
@@ -82,8 +79,6 @@
         }
 
         .blur {
-            visibility: hidden;
-            opacity: 0;
             width: 100%;
             height: 100%;
             position: fixed;
@@ -91,7 +86,6 @@
             left: 0;
             -webkit-backdrop-filter: blur(5px);
             backdrop-filter: blur(5px);
-            transition: visibility 1s, opacity 1s;
         }
 
         .startbutton {
@@ -101,7 +95,6 @@
             bottom: 5vh;
             left: 50%;
             transform: translateX(-50%);
-            transition: visibility 1s, opacity 1s;
             font-size: 25px;
         }
 
@@ -145,7 +138,7 @@
             position: relative;
         }
 
-        #start.visible~.startbutton {
+        #start:not([class*=hidden])~.startbutton {
             visibility: hidden;
             opacity: 0;
         }
@@ -154,7 +147,7 @@
             margin-bottom: 5px;
         }
 
-        .closebutton  {
+        .closebutton {
             position: absolute;
             top: 0;
             right: 0;
@@ -163,10 +156,14 @@
             font-size: 30px;
             transition: scale .1s;
         }
-        
-        .visible {
-            visibility: visible !important;
-            opacity: 1 !important;
+
+        .hidden {
+            visibility: hidden !important;
+            opacity: 0 !important;
+        }
+
+        .fade-transition {
+            transition: visibility 1s, opacity 1s;
         }
 
         #start input[type=number] {
@@ -193,8 +190,6 @@
         }
 
         .summary+.details {
-            visibility: hidden;
-            max-height: 0;
             transition: visibility 1s, max-height 1s;
         }
 
@@ -232,12 +227,12 @@
             width: 0;
             height: 0;
             border-top: 5px solid transparent !important;
-            border-bottom: 5px solid transparent  !important;
+            border-bottom: 5px solid transparent !important;
             border-left: 12px solid white !important;
             border-right: none;
             transition: rotate .1s;
         }
-        
+
         .summary>input:checked+span {
             rotate: 90deg;
         }
@@ -265,9 +260,6 @@
             background-color: rgb(25, 25, 25);
             image-rendering: pixelated;
             border-radius: 50%;
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 1s, opacity 1s;
         }
 
         #filter {
@@ -285,8 +277,6 @@
         }
 
         #joystick {
-            visibility: hidden;
-            width: 120px;
             height: 120px;
             position: fixed;
             bottom: 50px;
@@ -321,7 +311,7 @@
             input[type=checkbox]+span:hover {
                 scale: 1.5;
             }
-            
+
             .summary>input+span:hover {
                 scale: 1;
             }
@@ -330,19 +320,23 @@
 </head>
 
 <body>
+    <script>
+        const $ = selectors => document.querySelector(selectors);
+        $.all = selectors => document.querySelectorAll(selectors);
+    </script>
     <header>
-        <h1 class="visible">Dungeon Maze</h1>
-        <form id="start" class="blur">
+        <h1 class="visible fade-transition">Dungeon Maze</h1>
+        <form id="start" class="blur hidden fade-transition">
             <div class="wrapper">
-                <a class="closebutton" onclick="document.querySelector('#start').classList.remove('visible')">&times;</a>
+                <a class="closebutton" title="Close" onclick="$('#start').classList.add('hidden')">&times;</a>
                 <label for="width">Size of the maze:</label>
-                <input type="number" min="10" max="100" name="width" id="width" value="20" />
+                <input type="number" min="10" max="100" id="width" value="20" />
                 <label for="height"> x </label>
-                <input type="number" min="10" max="100" name="height" id="height" value="20" />
+                <input type="number" min="10" max="100" id="height" value="20" />
                 <br />
                 <label for="show-minimap">Show mini map</label>
                 <label class="checkbox-container">
-                    <input type="checkbox" name="minimap" id="show-minimap" />
+                    <input type="checkbox" id="show-minimap" />
                     <span></span>
                 </label>
                 <br /> <br />
@@ -350,15 +344,16 @@
                     <input type="checkbox" class="summary" />
                     <span></span>
                 </label>
-                <textarea name="importmaze" id="importmaze" class="details"></textarea>
-                <button type="submit" class="grey button startbutton">START</button>
+                <textarea id="importmaze" class="details hidden"></textarea>
+                <button type="submit" class="grey button startbutton fade-transition">START</button>
             </div>
         </form>
-        <button type="button" class="grey button startbutton" onclick="document.querySelector('#start').classList.add('visible')">START</button>
+        <button type="button" class="grey button startbutton fade-transition"
+            onclick="$('#start').classList.remove('hidden')">START</button>
     </header>
-    <canvas id="game" class="visible"></canvas>
+    <canvas id="game" class="visible fade-transition"></canvas>
     <div id="filter"></div>
-    <div id="joystick">
+    <div id="joystick" class="fade-transition hidden">
         <div></div>
     </div>
 
