@@ -89,8 +89,6 @@
         }
 
         .startbutton {
-            visibility: visible;
-            opacity: 1;
             position: fixed;
             bottom: 5vh;
             left: 50%;
@@ -104,6 +102,8 @@
             margin: 10px auto;
             transform: none;
         }
+
+
 
         .wrapper {
             width: 100%;
@@ -190,6 +190,8 @@
         }
 
         .summary+.details {
+            max-height: 0;
+            visibility: hidden;
             transition: visibility 1s, max-height 1s;
         }
 
@@ -276,16 +278,27 @@
             box-shadow: inset 0 0 60px 60px black;
         }
 
+        div:has(#joystick) {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            width: 50%;
+            height: 50%;
+            z-index: 5;
+        }
+
         #joystick {
+            width: 120px;
             height: 120px;
             position: fixed;
-            bottom: 50px;
-            left: 25px;
+            bottom: 10vh;
+            left: 25%;
+            transform: translate(-50%, -50%);
             background-image: url(assets/control.png);
             background-size: 240px 120px;
             background-position: 0 0;
             background-repeat: no-repeat;
-            z-index: 2;
+            z-index: 5;
         }
 
         #joystick div {
@@ -344,17 +357,18 @@
                     <input type="checkbox" class="summary" />
                     <span></span>
                 </label>
-                <textarea id="importmaze" class="details hidden"></textarea>
-                <button type="submit" class="grey button startbutton fade-transition">START</button>
+                <textarea id="importmaze" class="details"></textarea>
+                <button type="submit" class="grey button startbutton">START</button>
             </div>
         </form>
-        <button type="button" class="grey button startbutton fade-transition"
-            onclick="$('#start').classList.remove('hidden')">START</button>
+        <button type="button" class="grey button startbutton fade-transition" onclick="$('#start').classList.remove('hidden')">START</button>
     </header>
     <canvas id="game" class="visible fade-transition"></canvas>
     <div id="filter"></div>
-    <div id="joystick" class="fade-transition hidden">
-        <div></div>
+    <div class="fade-transition hidden">
+        <div id="joystick">
+            <div></div>
+        </div>
     </div>
 
     <script src="maze_generator.js"></script>

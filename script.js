@@ -2,7 +2,6 @@
 
 /** TODO:
  * Adding mini map option
- * Adding touch input for mobile phone.
  * Adding time mechanic
  * Setting up ending screen
  */
@@ -46,7 +45,9 @@ $('#start').addEventListener('submit', e => {
         playerX = 40, playerY = 40;
 
         $('#game').classList.remove('hidden');
-    }, 1000);
+
+        if (detectMob()) $('div:has(#joystick)').classList.remove('hidden');
+    }, 1e3);
 });
 
 let keys = {};
@@ -59,9 +60,65 @@ window.addEventListener('keyup', e => {
     keys[e.code] = false;
 });
 
+// Touchscreen input
+let jsCenterX, jsCenterY;
+$('div:has(#joystick)').addEventListener('touchstart', e => {
+    jsCenterX = e.targetTouches[0].pageX;
+    jsCenterY = e.targetTouches[0].pageY;
+
+    positionTheJoystick: {
+        let css = $('#joystick').style;
+        css.left = jsCenterX + 'px';
+        css.top = jsCenterY + 'px';
+        css.bottom = 'auto';
+    };
+});
+
+let touchXOfs = 0,
+    touchYOfs = 0;
+$('div:has(#joystick)').addEventListener('touchmove', e => {
+    touchXOfs = (e.targetTouches[0].pageX - jsCenterX) / 60;
+    touchYOfs = (e.targetTouches[0].pageY - jsCenterY) / 60;
+    if (touchXOfs < -1) touchXOfs = -1;
+    if (touchXOfs > 1) touchXOfs = 1;
+    if (touchYOfs < -1) touchYOfs = -1;
+    if (touchYOfs > 1) touchYOfs = 1;
+
+    positionTheJoystickThumb: {
+        let css = $('#joystick div').style;
+        css.left = touchXOfs * 100 / 2 + 50 + '%';
+        css.top = touchYOfs * 100 / 2 + 50 + '%';
+    };
+});
+
+$('div:has(#joystick)').addEventListener('touchend', e => {
+    touchXOfs = 0, touchYOfs = 0;
+
+    positionTheJoystick: {
+        let css = $('#joystick').style;
+        css.left = '25%';
+        css.top = 'auto';
+        css.bottom = '10vh';
+    };
+
+    positionTheJoystickThumb: {
+        let css = $('#joystick div').style;
+        css.left = '50%';
+        css.top = '50%';
+    };
+});
+
 character_sprite.src = 'assets/character.png';
 texture.src = 'assets/texture.png';
-shadow.src = 'assets/shadow.png'
+shadow.src = 'assets/shadow.png';
+
+function detectMob() {
+    return [/Android/i, /webOS/i, /iPhone/i, /iPad/i,
+            /iPod/i, /BlackBerry/i, /Windows Phone/i
+        ].some((toMatchItem) => {
+        return navigator.userAgent.match(toMatchItem);
+    });
+}
 
 function getLazyMaze(playerX, playerY) {
     let mazeX = Math.floor(playerX / 80),
@@ -95,15 +152,26 @@ function gameLoop() {
     let move = false;
     let currentTile = maze[Math.floor(playerY / 80)][Math.floor(playerX / 80)];
 
-    if (keys.ArrowUp || keys.KeyW) speedY = -speed_, sy = 1; // Move up
-    if (keys.ArrowDown || keys.KeyS) speedY = speed_, sy = 0; // Move down
-    if (keys.ArrowLeft || keys.KeyA) speedX = -speed_, sy = 2; // Move left
-    if (keys.ArrowRight || keys.KeyD) speedX = speed_, sy = 3; // Move right
+    if (touchXOfs || touchYOfs) {
+        speedX = touchXOfs * speed_ * 1.5;
+        speedY = touchYOfs * speed_ * 1.5;
+        if (Math.abs(touchXOfs) > Math.abs(touchYOfs))
+            if (touchXOfs > 0) sy = 3;
+            else sy = 2;
+        else
+        if (touchYOfs > 0) sy = 0;
+        else sy = 1;
+    } else {
+        if (keys.ArrowUp || keys.KeyW) speedY = -speed_, sy = 1; // Move up
+        if (keys.ArrowDown || keys.KeyS) speedY = speed_, sy = 0; // Move down
+        if (keys.ArrowLeft || keys.KeyA) speedX = -speed_, sy = 2; // Move left
+        if (keys.ArrowRight || keys.KeyD) speedX = speed_, sy = 3; // Move right
+    }
+
     if (speedX || speedY) move = true;
 
     let nextX = playerX % 80 + speedX,
         nextY = playerY % 80 + speedY;
-    // console.log(speedX, speedY)
 
     // Stop if collide with wall
     if (!(currentTile & 1) && nextY < 10) speedY = 0;
