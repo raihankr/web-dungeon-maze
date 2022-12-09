@@ -96,9 +96,9 @@ $('div:has(#joystick)').addEventListener('touchend', e => {
 
     positionTheJoystick: {
         let css = $('#joystick').style;
-        css.left = '25%';
+        css.left = '100px';
         css.top = 'auto';
-        css.bottom = '10vh';
+        css.bottom = '10px';
     };
 
     positionTheJoystickThumb: {
@@ -158,8 +158,7 @@ function gameLoop() {
         if (Math.abs(touchXOfs) > Math.abs(touchYOfs))
             if (touchXOfs > 0) sy = 3;
             else sy = 2;
-        else
-        if (touchYOfs > 0) sy = 0;
+        else if (touchYOfs > 0) sy = 0;
         else sy = 1;
     } else {
         if (keys.ArrowUp || keys.KeyW) speedY = -speed_, sy = 1; // Move up
@@ -190,6 +189,8 @@ function gameLoop() {
         if (move && ++sx > 3) sx = 0;
         if (!move) sy = 0;
     }
+
+    if (playerX % 80 == maze[0].length && playerY % 80 == maze.length) console.log('finish');
 
     function forEachTile(handler) {
         let lazyMaze = getLazyMaze(playerX, playerY);
@@ -254,6 +255,4 @@ function gameLoop() {
     });
 
     drawPlayer((!move || sx == 3) ? 1 : sx, (!move) ? 0 : sy);
-
-    // $('#debug').innerHTML = parseInt(playerX) + ',' + parseInt(playerY);
 }
