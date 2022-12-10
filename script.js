@@ -2,7 +2,6 @@
 
 /** TODO:
  * Adding mini map option
- * Adding time mechanic
  * Setting up ending screen
  */
 
@@ -28,9 +27,11 @@ let maze = generateMaze(3, 3),
     sy = 0;
 
 // Start a new game
+let gameOn = false;
 $('#start').addEventListener('submit', e => {
     e.preventDefault();
 
+    gameOn = true;
     let width = $('#width').value;
     let height = $('#height').value;
     let showMinimap = $('#show-minimap').checked ? 1 : 0;
@@ -45,8 +46,9 @@ $('#start').addEventListener('submit', e => {
         playerX = 40, playerY = 40;
 
         $('#game').classList.remove('hidden');
-
         if (detectMob()) $('div:has(#joystick)').classList.remove('hidden');
+
+        startTimer();
     }, 1e3);
 });
 
@@ -120,6 +122,24 @@ function detectMob() {
     });
 }
 
+async function startTimer() {
+    $('#timer').classList.remove('hidden');
+
+    let start = window.performance.now();
+    let currTime = 0;
+    let currTimer = setInterval(timer, 1e2);
+
+    async function timer() {
+        if (gameOn) {
+            $('#timer').innerHTML = (currTime += .1).toFixed(1) + 's';
+        } else {
+            let currTime = (window.performance.now() - start) / 1e3;
+            $('#timer').innerHTML = currTime.toFixed(3) + 's';
+            clearInterval(currTimer);
+        }
+    }
+}
+
 function getLazyMaze(playerX, playerY) {
     let mazeX = Math.floor(playerX / 80),
         mazeY = Math.floor(playerY / 80);
@@ -190,7 +210,9 @@ function gameLoop() {
         if (!move) sy = 0;
     }
 
-    if (playerX % 80 == maze[0].length && playerY % 80 == maze.length) console.log('finish');
+    if (gameOn && Math.floor(playerX / 80) == maze[0].length - 1 && Math.floor(playerY / 80) == maze.length - 1) {
+        gameOn = false;
+    }
 
     function forEachTile(handler) {
         let lazyMaze = getLazyMaze(playerX, playerY);
