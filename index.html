@@ -14,9 +14,9 @@
         const $ = selectors => document.querySelector(selectors);
         $.all = selectors => document.querySelectorAll(selectors);
     </script>
-    <header>
+    <p id="author">Made by <a href="https://github.com/raihankr" target="_blank">Han</a></p>
+    <header class="fade-transition">
         <h1 class="fade-transition">Dungeon Maze</h1>
-        <p id="author">Made by <a href="https://github.com/raihankr" target="_blank">Han</a></p>
         <form id="start" class="blur hidden fade-transition">
             <div class="outer-wrapper">
                 <a class="closebutton" title="Close" onclick="$('#start').classList.add('hidden')">&times;</a>
@@ -51,15 +51,31 @@
         <button type="button" class="grey button startbutton fade-transition"
             onclick="$('#start').classList.remove('hidden')">START</button>
     </header>
-    <div id="finish-screen">
 
+    <div id="finish-screen" class="blur fade-transition hidden">
+        <h1>FINISH!!!</h1>
+        <div class="outer-wrapper inner-wrapper overflow-fade">
+            <br><br>
+            <p id="finish-screen-maze-size">20 &times; 20 maze</p>
+            <p id="finish-screen-time">time: 87.3 second</p>
+            <a id="copy-maze-data">&#10697; Copy maze data</a>
+            <br><br>
+            <p>Too easy? Try bigger maze!</p>
+            <button type="button" id="play-again-btn" class="grey button">PLAY AGAIN</button>
+        </div>
     </div>
-    <canvas id="game" class="visible fade-transition"></canvas>
+
+    <canvas id="game" class="fade-transition"></canvas>
     <div id="vignette"></div>
-    <span id="timer" class="hidden fade-transition">69.420s</span>
-    <div class="fade-transition hidden">
-        <div id="joystick">
-            <div></div>
+    <div id="in-game-interfaces" class="fade-transition hidden">
+        <div id="hud">
+            <span id="timer" class="fade-transition"></span>
+            <span id="coord" class="hidden fade-transition">Player Coordinate: (3, 4)</span>
+        </div>
+        <div id="joystick-area" class="fade-transition hidden">
+            <div id="joystick">
+                <div></div>
+            </div>
         </div>
     </div>
 

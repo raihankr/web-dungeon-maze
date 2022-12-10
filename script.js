@@ -2,7 +2,7 @@
 
 /** TODO:
  * Adding mini map
- * Setting up ending screen
+ * Adding pause menu
  */
 
 const canvas = $('#game'),
@@ -43,13 +43,14 @@ $('#start').addEventListener('submit', e => {
     localStorage.showMinimap = showMinimap;
     localStorage.showCoord = showCoord;
 
-    $.all('#game, #start, header h1, header>.startbutton').forEach(el => el.classList.add('hidden'));
+    $.all('#game, header').forEach(el => el.classList.add('hidden'));
     setTimeout(() => {
         maze = generateMaze(width, height);
         playerX = 40, playerY = 40;
 
-        $('#game').classList.remove('hidden');
-        if (detectMob()) $('div:has(#joystick)').classList.remove('hidden');
+        $.all('#game, #in-game-interfaces').forEach(el => el.classList.remove('hidden'));
+        if (showCoord) $('#coord').classList.remove('hidden');
+        if (detectMob()) $('#joystick-area').classList.remove('hidden');
 
         startTimer();
     }, 1e3);
@@ -67,7 +68,7 @@ window.addEventListener('keyup', e => {
 
 // Touchscreen input
 let jsCenterX, jsCenterY;
-$('div:has(#joystick)').addEventListener('touchstart', e => {
+$('#joystick-area').addEventListener('touchstart', e => {
     jsCenterX = e.targetTouches[0].pageX;
     jsCenterY = e.targetTouches[0].pageY;
 
@@ -81,7 +82,7 @@ $('div:has(#joystick)').addEventListener('touchstart', e => {
 
 let touchXOfs = 0,
     touchYOfs = 0;
-$('div:has(#joystick)').addEventListener('touchmove', e => {
+$('#joystick-area').addEventListener('touchmove', e => {
     touchXOfs = (e.targetTouches[0].pageX - jsCenterX) / 60;
     touchYOfs = (e.targetTouches[0].pageY - jsCenterY) / 60;
     if (touchXOfs < -1) touchXOfs = -1;
@@ -96,7 +97,7 @@ $('div:has(#joystick)').addEventListener('touchmove', e => {
     };
 });
 
-$('div:has(#joystick)').addEventListener('touchend', e => {
+$('#joystick-area').addEventListener('touchend', e => {
     touchXOfs = 0, touchYOfs = 0;
 
     {
@@ -125,19 +126,17 @@ function detectMob() {
     });
 }
 
-async function startTimer() {
-    $('#timer').classList.remove('hidden');
-
+function startTimer() {
     let start = window.performance.now();
     let currTime = 0;
     let currTimer = setInterval(timer, 1e2);
 
-    async function timer() {
+    function timer() {
         if (gameOn) {
             $('#timer').innerHTML = (currTime += .1).toFixed(1) + 's';
         } else {
             let currTime = (window.performance.now() - start) / 1e3;
-            $('#timer').innerHTML = currTime.toFixed(3) + 's';
+            $('#finish-screen-time').innerHTML = `Time: ${currTime.toFixed(3)} second`;
             clearInterval(currTimer);
         }
     }
@@ -162,6 +161,17 @@ function drawPlayer(sx = 1, sy = 0) {
     let dw = 34,
         dh = 51;
     ctx.drawImage(character_sprite, 16 * sx * 8, 24 * sy * 8, 16 * 8, 24 * 8, 200 - dw / 2, 200 - dh, dw, dh);
+}
+
+function onGameEnded() {
+    $('#in-game-interfaces').classList.add('hidden');
+    $('#finish-screen').classList.remove('hidden');
+    $('#finish-screen-maze-size').innerHTML = `${maze[0].length} &times; ${maze.length} maze`;
+    $('#finish-screen-time').innerHTML = `Time: `;
+}
+
+function playAgain() {
+    
 }
 
 setInterval(gameLoop, 1e3 / 30);
@@ -215,7 +225,10 @@ function gameLoop() {
 
     if (gameOn && Math.floor(playerX / 80) == maze[0].length - 1 && Math.floor(playerY / 80) == maze.length - 1) {
         gameOn = false;
+        onGameEnded();
     }
+
+    $('#coord').innerHTML = `Player position: (${Math.floor(playerX / 80) + 1}, ${Math.floor(playerY / 80) + 1})`;
 
     function forEachTile(handler) {
         let lazyMaze = getLazyMaze(playerX, playerY);

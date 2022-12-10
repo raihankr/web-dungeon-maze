@@ -44,7 +44,7 @@ header {
     z-index: 5;
 }
 
-header h1 {
+h1 {
     position: fixed;
     top: 5vh;
     left: 50%;
@@ -63,6 +63,7 @@ label {
     padding: 5px;
     color: #555;
     background-color: #a0a0a0;
+    font-size: 30px;
     text-align: center;
     text-decoration: none;
     border-top: 8px solid #cfcfcf;
@@ -84,8 +85,9 @@ label {
     position: fixed;
     top: 0;
     left: 0;
-    -webkit-backdrop-filter: blur(5px);
-    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    z-index: 5;
 }
 
 .startbutton {
@@ -114,10 +116,12 @@ label {
     max-width: 600px;
     display: block;
     margin: auto;
+    margin-top: 37vh;
 }
 
 .inner-wrapper {
     width: 100%;;
+    height: 45vh;
     overflow-x: hidden;
     overflow-y: scroll;
     overflow-wrap: word-wrap;
@@ -131,12 +135,7 @@ label {
 .inner-wrapper::-webkit-scrollbar-thumb { background: white }
 
 #start {
-    padding-top: 28vh;
     font-size: 15px;
-}
-
-#start .inner-wrapper {
-    height: 45vh;
 }
 
 #start:not([class*=hidden])~.startbutton {
@@ -144,9 +143,11 @@ label {
     opacity: 0;
 }
 
-#start .inner-wrapper>* {
+.inner-wrapper>* {
     margin-bottom: 15px;
 }
+
+#finish-screen>div { text-align: center }
 
 .closebutton {
     position: absolute;
@@ -287,7 +288,13 @@ textarea {
     transform: translateX(-50%);
 }
 
-div:has(#joystick) {
+#coord {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+}
+
+#joystick-area {
     position: fixed;
     top: 50%;
     left: 0;
