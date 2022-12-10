@@ -1,7 +1,7 @@
 'use strict';
 
 /** TODO:
- * Adding mini map option
+ * Adding mini map
  * Setting up ending screen
  */
 
@@ -14,6 +14,7 @@ canvas.height = 400;
 $('#width').value = localStorage.width || 20;
 $('#height').value = localStorage.height || 20;
 $('#show-minimap').checked = parseInt(localStorage.showMinimap);
+$('#show-coordinate').checked = parseInt(localStorage.showCoord);
 
 let maze = generateMaze(3, 3),
     character_sprite = new Image,
@@ -35,10 +36,12 @@ $('#start').addEventListener('submit', e => {
     let width = $('#width').value;
     let height = $('#height').value;
     let showMinimap = $('#show-minimap').checked ? 1 : 0;
+    let showCoord = $('#show-coordinate').checked ? 1 : 0;
 
     localStorage.width = width;
     localStorage.height = height;
     localStorage.showMinimap = showMinimap;
+    localStorage.showCoord = showCoord;
 
     $.all('#game, #start, header h1, header>.startbutton').forEach(el => el.classList.add('hidden'));
     setTimeout(() => {
@@ -68,7 +71,7 @@ $('div:has(#joystick)').addEventListener('touchstart', e => {
     jsCenterX = e.targetTouches[0].pageX;
     jsCenterY = e.targetTouches[0].pageY;
 
-    positionTheJoystick: {
+    {
         let css = $('#joystick').style;
         css.left = jsCenterX + 'px';
         css.top = jsCenterY + 'px';
@@ -86,7 +89,7 @@ $('div:has(#joystick)').addEventListener('touchmove', e => {
     if (touchYOfs < -1) touchYOfs = -1;
     if (touchYOfs > 1) touchYOfs = 1;
 
-    positionTheJoystickThumb: {
+    {
         let css = $('#joystick div').style;
         css.left = touchXOfs * 100 / 2 + 50 + '%';
         css.top = touchYOfs * 100 / 2 + 50 + '%';
@@ -96,14 +99,14 @@ $('div:has(#joystick)').addEventListener('touchmove', e => {
 $('div:has(#joystick)').addEventListener('touchend', e => {
     touchXOfs = 0, touchYOfs = 0;
 
-    positionTheJoystick: {
+    {
         let css = $('#joystick').style;
         css.left = '100px';
         css.top = 'auto';
         css.bottom = '10px';
     };
 
-    positionTheJoystickThumb: {
+    {
         let css = $('#joystick div').style;
         css.left = '50%';
         css.top = '50%';

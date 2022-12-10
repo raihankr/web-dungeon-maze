@@ -15,32 +15,45 @@
         $.all = selectors => document.querySelectorAll(selectors);
     </script>
     <header>
-        <h1 class="visible fade-transition">Dungeon Maze</h1>
+        <h1 class="fade-transition">Dungeon Maze</h1>
+        <p id="author">Made by <a href="https://github.com/raihankr" target="_blank">Han</a></p>
         <form id="start" class="blur hidden fade-transition">
-            <div class="wrapper">
+            <div class="outer-wrapper">
                 <a class="closebutton" title="Close" onclick="$('#start').classList.add('hidden')">&times;</a>
-                <label for="width">Size of the maze:</label>
-                <input type="number" min="10" max="100" id="width" value="20">
-                <label for="height"> x </label>
-                <input type="number" min="10" max="100" id="height" value="20">
-                <br>
-                <label for="show-minimap">Show mini map</label>
-                <label class="checkbox-container">
-                    <input type="checkbox" id="show-minimap">
-                    <span></span>
-                </label>
-                <br><br>
-                <label class="checkbox-container summary">Import maze (optional)
-                    <input type="checkbox" class="summary">
-                    <span></span>
-                </label>
-                <textarea id="importmaze" class="details"></textarea>
-                <button type="submit" class="grey button startbutton">START</button>
+                <div class="inner-wrapper overflow-fade">
+                    <br><br>
+                    <label for="width">Size of the maze:</label>
+                    <input type="number" min="10" max="100" id="width" value="20">
+                    <label for="height"> x </label>
+                    <input type="number" min="10" max="100" id="height" value="20">
+                    <br>
+                    <label for="show-minimap">Show minimap</label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="show-minimap" checked>
+                        <span></span>
+                    </label>
+                    <br>
+                    <label for="show-coordinate">Show coordinate</label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="show-coordinate" checked>
+                        <span></span>
+                    </label>
+                    <br><br>
+                    <label class="checkbox-container summary">Import maze (optional)
+                        <input type="checkbox" class="summary">
+                        <span></span>
+                    </label>
+                    <textarea id="importmaze" class="details"></textarea>
+                    <button type="submit" class="grey button startbutton">START</button>
+                </div>
             </div>
         </form>
-        <button type="button" class="grey button startbutton fade-transition" onclick="$('#start').classList.remove('hidden')">START</button>
+        <button type="button" class="grey button startbutton fade-transition"
+            onclick="$('#start').classList.remove('hidden')">START</button>
     </header>
-    <div id="finish-screen"></div>
+    <div id="finish-screen">
+
+    </div>
     <canvas id="game" class="visible fade-transition"></canvas>
     <div id="vignette"></div>
     <span id="timer" class="hidden fade-transition">69.420s</span>

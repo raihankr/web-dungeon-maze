@@ -28,6 +28,15 @@ body {
     overflow: hidden;
 }
 
+#author {
+    position: fixed;
+    font-weight: 100;
+    right: 20px;
+    bottom: 0;
+    font-size: 1rem;
+    z-index: 10;
+}
+
 header {
     width: 100%;
     height: 100%;
@@ -87,6 +96,11 @@ label {
     font-size: 25px;
 }
 
+.overflow-fade {
+    -webkit-mask-image: linear-gradient(transparent, black 20%, black 80%, transparent 100%);
+    mask-image: linear-gradient(transparent, black 20%, black 80%, transparent 100%);
+}
+
 #start .startbutton {
     position: initial;
     display: block;
@@ -94,37 +108,35 @@ label {
     transform: none;
 }
 
-.wrapper {
+.outer-wrapper {
+    position: relative;
     width: 100%;
     max-width: 600px;
     display: block;
+    margin: auto;
+}
+
+.inner-wrapper {
+    width: 100%;;
     overflow-x: hidden;
     overflow-y: scroll;
     overflow-wrap: word-wrap;
     padding: 15px;
-    margin: auto;
 }
 
-.wrapper::-webkit-scrollbar {
-    width: 5px;
-}
+.inner-wrapper::-webkit-scrollbar { width: 5px }
 
-.wrapper::-webkit-scrollbar-track {
-    background: #79797950;
-}
+.inner-wrapper::-webkit-scrollbar-track { background: #79797950 }
 
-.wrapper::-webkit-scrollbar-thumb {
-    background: white;
-}
+.inner-wrapper::-webkit-scrollbar-thumb { background: white }
 
 #start {
-    padding-top: 40vh;
+    padding-top: 28vh;
     font-size: 15px;
 }
 
-#start .wrapper {
+#start .inner-wrapper {
     height: 45vh;
-    position: relative;
 }
 
 #start:not([class*=hidden])~.startbutton {
@@ -132,8 +144,8 @@ label {
     opacity: 0;
 }
 
-#start .wrapper>* {
-    margin-bottom: 5px;
+#start .inner-wrapper>* {
+    margin-bottom: 15px;
 }
 
 .closebutton {
@@ -144,6 +156,7 @@ label {
     height: 30px;
     font-size: 30px;
     transition: scale .1s;
+    z-index: 10;
 }
 
 .hidden {
