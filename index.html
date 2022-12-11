@@ -14,54 +14,53 @@
         const $ = selectors => document.querySelector(selectors);
         $.all = selectors => document.querySelectorAll(selectors);
     </script>
+    <div class="blur hidden fade-transition" id="blur-filter"></div>
     <p id="author">Made by <a href="https://github.com/raihankr" target="_blank">Han</a></p>
     <header class="fade-transition">
         <h1 class="fade-transition">Dungeon Maze</h1>
-        <form id="start" class="blur hidden fade-transition">
-            <div class="outer-wrapper">
-                <a class="closebutton" title="Close" onclick="$('#start').classList.add('hidden')">&times;</a>
-                <div class="inner-wrapper overflow-fade">
-                    <br><br>
-                    <label for="width">Size of the maze:</label>
-                    <input type="number" min="10" max="100" id="width" value="20">
-                    <label for="height"> x </label>
-                    <input type="number" min="10" max="100" id="height" value="20">
-                    <br>
-                    <label for="show-minimap">Show minimap</label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="show-minimap" checked>
-                        <span></span>
-                    </label>
-                    <br>
-                    <label for="show-coordinate">Show coordinate</label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="show-coordinate" checked>
-                        <span></span>
-                    </label>
-                    <br><br>
-                    <label class="checkbox-container summary">Import maze (optional)
-                        <input type="checkbox" class="summary">
-                        <span></span>
-                    </label>
-                    <textarea id="importmaze" class="details"></textarea>
-                    <button type="submit" class="grey button startbutton">START</button>
-                </div>
+        <form id="start" class="outer-wrapper hidden fade-transition">
+            <a class="closebutton" title="Close" onclick="$.all('#start, #blur-filter').forEach(el => el.classList.add('hidden'))">&times;</a>
+            <div class="inner-wrapper overflow-fade">
+                <br><br>
+                <label for="width">Size of the maze:</label>
+                <input type="number" min="10" max="100" id="width" value="20">
+                <label for="height"> x </label>
+                <input type="number" min="10" max="100" id="height" value="20">
+                <br>
+                <label for="show-radar">Show radar</label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="show-radar" checked>
+                    <span></span>
+                </label>
+                <br>
+                <label for="show-coordinate">Show coordinate</label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="show-coordinate" checked>
+                    <span></span>
+                </label>
+                <br><br>
+                <label class="checkbox-container summary">Import maze (optional)
+                    <input type="checkbox" class="summary">
+                    <span></span>
+                </label>
+                <textarea id="importmaze" class="details"></textarea>
+                <button type="submit" class="grey button startbutton">START</button>
             </div>
         </form>
         <button type="button" class="grey button startbutton fade-transition"
-            onclick="$('#start').classList.remove('hidden')">START</button>
+            onclick="$.all('#start, #blur-filter').forEach(el => el.classList.remove('hidden'))">START</button>
     </header>
 
-    <div id="finish-screen" class="blur fade-transition hidden">
+    <div id="finish-screen" class="outer-wrapper hidden fade-transition">
         <h1>FINISH!!!</h1>
-        <div class="outer-wrapper inner-wrapper overflow-fade">
+        <div class="inner-wrapper overflow-fade">
             <br><br>
-            <p id="finish-screen-maze-size">20 &times; 20 maze</p>
-            <p id="finish-screen-time">time: 87.3 second</p>
+            <p id="finish-screen-maze-size"></p>
+            <p id="finish-screen-time"></p>
             <a id="copy-maze-data">&#10697; Copy maze data</a>
             <br><br>
             <p>Too easy? Try bigger maze!</p>
-            <button type="button" id="play-again-btn" class="grey button">PLAY AGAIN</button>
+            <button type="button" class="grey button" onclick="playAgain()">PLAY AGAIN</button>
         </div>
     </div>
 
@@ -71,6 +70,7 @@
         <div id="hud">
             <span id="timer" class="fade-transition"></span>
             <span id="coord" class="hidden fade-transition">Player Coordinate: (3, 4)</span>
+            <canvas id="radar" class="hidden fade-transition"></canvas>
         </div>
         <div id="joystick-area" class="fade-transition hidden">
             <div id="joystick">

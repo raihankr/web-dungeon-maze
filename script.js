@@ -1,19 +1,22 @@
 'use strict';
 
 /** TODO:
- * Adding mini map
  * Adding pause menu
+ * Adding loading screen while generating maze
  */
 
-const canvas = $('#game'),
-    ctx = canvas.getContext('2d');
+const game = $('#game').getContext('2d'),
+    radar = $('#radar').getContext('2d');
 
-canvas.width = 400;
-canvas.height = 400;
+$('#game').width = 400;
+$('#game').height = 400;
+
+$('#radar').width = 210;
+$('#radar').height = 210;
 
 $('#width').value = localStorage.width || 20;
 $('#height').value = localStorage.height || 20;
-$('#show-minimap').checked = parseInt(localStorage.showMinimap);
+$('#show-radar').checked = parseInt(localStorage.showRadar);
 $('#show-coordinate').checked = parseInt(localStorage.showCoord);
 
 let maze = generateMaze(3, 3),
@@ -22,7 +25,7 @@ let maze = generateMaze(3, 3),
     shadow = new Image,
     playerX = 120,
     playerY = 120,
-    speed = 3,
+    speed = 5,
     animation_countdown = 5,
     sx = 1,
     sy = 0;
@@ -32,27 +35,29 @@ let gameOn = false;
 $('#start').addEventListener('submit', e => {
     e.preventDefault();
 
-    gameOn = true;
     let width = $('#width').value;
     let height = $('#height').value;
-    let showMinimap = $('#show-minimap').checked ? 1 : 0;
+    let showRadar = $('#show-radar').checked ? 1 : 0;
     let showCoord = $('#show-coordinate').checked ? 1 : 0;
 
     localStorage.width = width;
     localStorage.height = height;
-    localStorage.showMinimap = showMinimap;
+    localStorage.showRadar = showRadar;
     localStorage.showCoord = showCoord;
 
-    $.all('#game, header').forEach(el => el.classList.add('hidden'));
+    $.all('#game, header, #blur-filter').forEach(el => el.classList.add('hidden'));
     setTimeout(() => {
         maze = generateMaze(width, height);
         playerX = 40, playerY = 40;
 
         $.all('#game, #in-game-interfaces').forEach(el => el.classList.remove('hidden'));
+        if (showRadar) $('#radar').classList.remove('hidden');
         if (showCoord) $('#coord').classList.remove('hidden');
         if (detectMob()) $('#joystick-area').classList.remove('hidden');
 
         startTimer();
+
+        gameOn = true;
     }, 1e3);
 });
 
@@ -118,6 +123,10 @@ character_sprite.src = 'assets/character.png';
 texture.src = 'assets/texture.png';
 shadow.src = 'assets/shadow.png';
 
+function playerXTile() { return Math.floor(playerX / 80) }
+
+function playerYTile() { return Math.floor(playerY / 80) }
+
 function detectMob() {
     return [/Android/i, /webOS/i, /iPhone/i, /iPad/i,
             /iPod/i, /BlackBerry/i, /Windows Phone/i
@@ -142,15 +151,16 @@ function startTimer() {
     }
 }
 
-function getLazyMaze(playerX, playerY) {
-    let mazeX = Math.floor(playerX / 80),
-        mazeY = Math.floor(playerY / 80);
-
-    let lazyMaze = [[], [], [], [], [], [], []];
-    for (let row in Array(7).fill())
-        for (let col in Array(7).fill()) {
-            let x = mazeX + parseInt(col) - 3,
-                y = mazeY + parseInt(row) - 3;
+function getLazyMaze(radius) {
+    let mazeX = playerXTile(),
+        mazeY = playerYTile(),
+        diameter = radius * 2 + 1;
+    
+    let lazyMaze = Array.from({ length: diameter }, _ => Array());
+    for (let row in Array(diameter).fill())
+        for (let col in Array(diameter).fill()) {
+            let x = mazeX + parseInt(col) - radius,
+                y = mazeY + parseInt(row) - radius;
             try { lazyMaze[row][col] = { conn: maze[y][x], x, y }; }
             catch (err) { lazyMaze[row][col] = { conn: undefined, x, y }; }
         }
@@ -160,44 +170,87 @@ function getLazyMaze(playerX, playerY) {
 function drawPlayer(sx = 1, sy = 0) {
     let dw = 34,
         dh = 51;
-    ctx.drawImage(character_sprite, 16 * sx * 8, 24 * sy * 8, 16 * 8, 24 * 8, 200 - dw / 2, 200 - dh, dw, dh);
+    game.drawImage(character_sprite, 16 * sx * 8, 24 * sy * 8, 16 * 8, 24 * 8, 200 - dw / 2, 200 - dh, dw, dh);
+}
+
+function onMoveTile() {
+    lazyMaze = getLazyMaze(3);
+    lastPos = [playerXTile(), playerYTile()];
+
+    $('#coord').innerHTML = `Player position: (${playerXTile() + 1}, ${playerYTile() + 1})`;
+
+    if (!gameOn) return;
+    let radarData = getLazyMaze(10);
+
+    radar.clearRect(0, 0, 210, 210);
+
+    radar.beginPath();
+    radar.fillStyle = 'yellow';
+    radar.ellipse(105, 105, 3, 3, 0, 0, 2 * Math.PI);
+    radar.fill();
+
+    forEachTile(radarData, v => {
+        if (v.tile.conn) {
+            let leftX = 10 * v.x,
+                topY = 10 * v.y;
+            console.log(leftX, topY)
+
+            let drawWall = (horizontal, invert = false) => {
+                if (invert) invert = 10;
+                else invert = 0;
+
+                radar.beginPath();
+                radar.moveTo(leftX + 10 - invert, topY + 10 - invert);
+                radar.lineTo(leftX + Math.abs((horizontal ? 0 : 10) - invert), topY + Math.abs((horizontal ? 10 : 0) - invert));
+                radar.stroke();
+            }
+
+            radar.strokeStyle = 'cyan';
+            radar.lineWidth = 1;
+            if (v.tile.x == 0) drawWall(false, true);
+            if (v.tile.y == 0) drawWall(true, true);
+            if (!(v.tile.conn & 4)) drawWall(false);
+            if (!(v.tile.conn & 2)) drawWall(true);
+        }
+    }, 20);
 }
 
 function onGameEnded() {
     $('#in-game-interfaces').classList.add('hidden');
-    $('#finish-screen').classList.remove('hidden');
+    $.all('#finish-screen, #blur-filter').forEach(el => el.classList.remove('hidden'));
     $('#finish-screen-maze-size').innerHTML = `${maze[0].length} &times; ${maze.length} maze`;
-    $('#finish-screen-time').innerHTML = `Time: `;
 }
 
 function playAgain() {
-    
+    $('#finish-screen').classList.add('hidden');
+    $('header').classList.remove('hidden');
 }
 
 setInterval(gameLoop, 1e3 / 30);
 
+let lastPos = [playerXTile(), playerYTile()],
+    lazyMaze = getLazyMaze(3);
 function gameLoop() {
-    ctx.clearRect(0, 0, 400, 400);
+    game.clearRect(0, 0, 400, 400);
 
     let speedX = 0,
         speedY = 0,
-        speed_ = speed / 400 * canvas.clientWidth;
-    let move = false;
-    let currentTile = maze[Math.floor(playerY / 80)][Math.floor(playerX / 80)];
+        move = false,
+        currentTile = maze[playerYTile()][playerXTile()];
 
     if (touchXOfs || touchYOfs) {
-        speedX = touchXOfs * speed_ * 1.5;
-        speedY = touchYOfs * speed_ * 1.5;
+        speedX = touchXOfs * speed;
+        speedY = touchYOfs * speed;
         if (Math.abs(touchXOfs) > Math.abs(touchYOfs))
             if (touchXOfs > 0) sy = 3;
             else sy = 2;
         else if (touchYOfs > 0) sy = 0;
         else sy = 1;
     } else {
-        if (keys.ArrowUp || keys.KeyW) speedY = -speed_, sy = 1; // Move up
-        if (keys.ArrowDown || keys.KeyS) speedY = speed_, sy = 0; // Move down
-        if (keys.ArrowLeft || keys.KeyA) speedX = -speed_, sy = 2; // Move left
-        if (keys.ArrowRight || keys.KeyD) speedX = speed_, sy = 3; // Move right
+        if (keys.ArrowUp || keys.KeyW) speedY = -speed, sy = 1; // Move up
+        if (keys.ArrowDown || keys.KeyS) speedY = speed, sy = 0; // Move down
+        if (keys.ArrowLeft || keys.KeyA) speedX = -speed, sy = 2; // Move left
+        if (keys.ArrowRight || keys.KeyD) speedX = speed, sy = 3; // Move right
     }
 
     if (speedX || speedY) move = true;
@@ -223,44 +276,34 @@ function gameLoop() {
         if (!move) sy = 0;
     }
 
-    if (gameOn && Math.floor(playerX / 80) == maze[0].length - 1 && Math.floor(playerY / 80) == maze.length - 1) {
+    if (lastPos.join() != [playerXTile(), playerYTile()]) onMoveTile();
+
+    if (gameOn && playerXTile() == maze[0].length - 1 && playerYTile() == maze.length - 1) {
         gameOn = false;
         onGameEnded();
     }
 
-    $('#coord').innerHTML = `Player position: (${Math.floor(playerX / 80) + 1}, ${Math.floor(playerY / 80) + 1})`;
-
-    function forEachTile(handler) {
-        let lazyMaze = getLazyMaze(playerX, playerY);
-        for (let [y, row] of lazyMaze.entries())
-            for (let [x, tile] of row.entries()) {
-                let leftX = 80 * (x - 1) - (playerX % 80 - 40),
-                    topY = 80 * (y - 1) - (playerY % 80 - 40);
-                handler({ lazyMaze, y, row, x, tile, leftX, topY });
-            }
-    }
-
     // Draw Tiles
-    forEachTile(v => {
+    forEachTile(lazyMaze, v => {
         if (v.tile.conn) {
             let drawTile = (sx, sy) =>
-                ctx.drawImage(texture, 0 + 32 * 8 * sx, 0 + 32 * 8 * sy, 32 * 8, 32 * 8, v.leftX, v.topY, 80, 80);
+                game.drawImage(texture, 0 + 32 * 8 * sx, 0 + 32 * 8 * sy, 32 * 8, 32 * 8, v.leftX, v.topY, 80, 80);
             if (v.tile.x == maze[0].length - 1 && v.tile.y == maze.length - 1) drawTile(1, 0);
             else drawTile(0, 0);
         }
     });
 
     // Draw player's shadow
-    ctx.save();
-    ctx.globalAlpha = .8;
-    ctx.drawImage(shadow, 0, 0, 16 * 8, 16 * 8, 200 - 34 / 2, 200 - 51 / 2, 34, 51);
-    ctx.restore();
+    game.save();
+    game.globalAlpha = .8;
+    game.drawImage(shadow, 0, 0, 16 * 8, 16 * 8, 200 - 34 / 2, 200 - 51 / 2, 34, 51);
+    game.restore();
 
     // Draw Walls' Edge
-    forEachTile(v => {
+    forEachTile(lazyMaze, v => {
         if (v.tile.conn) {
             let drawEdge = (x, y, full) =>
-                ctx.drawImage(texture, 28 * 8, !full ? 32 * 8 : 40 * 8, 8 * 8, 8 * 8, x, y, 20, 20);
+                game.drawImage(texture, 28 * 8, !full ? 32 * 8 : 40 * 8, 8 * 8, 8 * 8, x, y, 20, 20);
 
             if (v.tile.x == 0 && v.tile.y == 0) drawEdge(v.leftX - 10, v.topY - 10, false);
             if (v.tile.x == 0)
@@ -271,17 +314,17 @@ function gameLoop() {
     });
 
     // Draw Walls
-    forEachTile(v => {
+    forEachTile(lazyMaze, v => {
         if (v.tile.conn) {
             let drawWall = (x, y, horizontal) => {
                 if (horizontal) {
-                    ctx.drawImage(texture, 0, 40 * 8, 28 * 8, 8 * 8, x, y, 60, 20);
+                    game.drawImage(texture, 0, 40 * 8, 28 * 8, 8 * 8, x, y, 60, 20);
                 } else {
-                    ctx.save();
-                    ctx.translate(x, y);
-                    ctx.rotate(-90 * Math.PI / 180);
-                    ctx.drawImage(texture, 0, 32 * 8, 28 * 8, 8 * 8, 0, 0, 60, 20);
-                    ctx.restore();
+                    game.save();
+                    game.translate(x, y);
+                    game.rotate(-90 * Math.PI / 180);
+                    game.drawImage(texture, 0, 32 * 8, 28 * 8, 8 * 8, 0, 0, 60, 20);
+                    game.restore();
                 }
             }
 
@@ -293,4 +336,13 @@ function gameLoop() {
     });
 
     drawPlayer((!move || sx == 3) ? 1 : sx, (!move) ? 0 : sy);
+}
+
+function forEachTile(maze, handler) {
+    for (let [y, row] of maze.entries())
+        for (let [x, tile] of row.entries()) {
+            let leftX = 80 * (x - 1) - (playerX % 80 - 40),
+                topY = 80 * (y - 1) - (playerY % 80 - 40);
+            handler({ lazyMaze, y, row, x, tile, leftX, topY });
+        }
 }

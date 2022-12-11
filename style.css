@@ -27,6 +27,7 @@ body {
     background-color: black;
     overflow: hidden;
 }
+p, span, label { font-size: 12px }
 
 #author {
     position: fixed;
@@ -42,6 +43,8 @@ header {
     height: 100%;
     position: fixed;
     z-index: 5;
+    left: 0;
+    top: 0;
 }
 
 h1 {
@@ -116,16 +119,19 @@ label {
     max-width: 600px;
     display: block;
     margin: auto;
-    margin-top: 37vh;
+    margin-top: 37vh; 
+    z-index: 5;
 }
 
 .inner-wrapper {
-    width: 100%;;
+    display: block;
+    width: 100%;
     height: 45vh;
     overflow-x: hidden;
     overflow-y: scroll;
     overflow-wrap: word-wrap;
     padding: 15px;
+    margin: auto;
 }
 
 .inner-wrapper::-webkit-scrollbar { width: 5px }
@@ -147,7 +153,7 @@ label {
     margin-bottom: 15px;
 }
 
-#finish-screen>div { text-align: center }
+#finish-screen { text-align: center }
 
 .closebutton {
     position: absolute;
@@ -281,10 +287,18 @@ textarea {
     box-shadow: inset 0 0 60px 60px black;
 }
 
+#in-game-interfaces {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+}
+
 #timer {
     position: fixed;
     left: 50%;
-    top: 10vh;
+    top: auto;
+    bottom: 10vh;
     transform: translateX(-50%);
 }
 
@@ -292,6 +306,15 @@ textarea {
     position: fixed;
     left: 20px;
     top: 20px;
+}
+
+#radar {
+    position: fixed;
+    right: 30px;
+    top: 10vh;
+    width: 120px;
+    height: 120px;
+    background-color: #0007;
 }
 
 #joystick-area {
@@ -343,5 +366,19 @@ textarea {
 
     .summary>input+span:hover {
         scale: 1;
+    }
+}
+
+@media screen and (min-width: 600px) and (min-height: 600px) {
+    p, span, label { font-size: 18px }
+
+    #timer {
+        top: 10vh;
+        bottom: auto;
+    }
+
+    #radar {
+        width: 30vh;
+        height: 30vh;
     }
 }
