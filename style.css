@@ -29,7 +29,7 @@ body {
 }
 p, span, label { font-size: 12px }
 
-#author {
+#copyright {
     position: fixed;
     font-weight: 100;
     right: 20px;
